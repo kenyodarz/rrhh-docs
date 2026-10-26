@@ -1,0 +1,11 @@
+site_name: Guías técnicas
+site_description: Documentación técnica revisada para publicación pública.
+site_url: https://kenyodarz.github.io/rrhh-docs/
+
+theme:
+  name: material
+  language: es
+
+nav:
+  - Inicio: index.md
+  - Git hooks y Semantic Release: git_hooks_semantic_release.md
