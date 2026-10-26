@@ -9,3 +9,5 @@ theme:
 nav:
   - Inicio: index.md
   - Git hooks y Semantic Release: git_hooks_semantic_release.md
+  - Gobernanza en Azure DevOps: guia_configuracion_azure_devops.md
+  - Aplicación de gestión de personal: guia_inicio_gestion_personal.md
