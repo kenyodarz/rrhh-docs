@@ -9,8 +9,8 @@ malformado ingrese al historial local.
 
 ## 1. Estándar de Commits Soportado
 
-- **Formato Estándar:** `COMMIT_TYPE(scope_name): descripción`
-- **Formato Breaking Change:** `COMMIT_TYPE(scope_name)!: descripción`
+- **Formato Estándar:** `COMMIT_TYPE(scope_name): descripción del cambio`
+- **Formato Breaking Change:** `COMMIT_TYPE(scope_name)!: descripción del cambio`
 - **Tipos Permitidos (`COMMIT_TYPE`):**
     - `feat`: Nuevas funcionalidades (**MINOR**).
     - `fix`: Corrección de errores (**PATCH**).
@@ -168,3 +168,4 @@ Para validar que la instalación fue exitosa:
    git commit -m "fix(auth_service): corregir validacion de token"
    # Salida esperada: Commit creado exitosamente.
    ```
+
