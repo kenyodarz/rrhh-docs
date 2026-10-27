@@ -1,13 +1,87 @@
-site_name: Guías técnicas
-site_description: Documentación técnica revisada para publicación pública.
+site_name: RRHH - Documentación Técnica
+site_description: Documentación técnica del sistema RRHH para desarrolladores.
+site_author: DIST25 - EXP E INNOVACION
 site_url: https://kenyodarz.github.io/rrhh-docs/
+repo_url: https://github.com/kenyodarz/RRHH
+repo_name: kenyodarz/RRHH
 
 theme:
   name: material
   language: es
+  palette:
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Cambiar a modo oscuro
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Cambiar a modo claro
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+extra_css:
+  - stylesheets/bancolombia.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search:
+      lang: es
 
 nav:
   - Inicio: index.md
-  - Git hooks y Semantic Release: git_hooks_semantic_release.md
-  - Gobernanza en Azure DevOps: guia_configuracion_azure_devops.md
-  - Aplicación de gestión de personal: guia_inicio_gestion_personal.md
+  - Capacidades funcionales (PO):
+      - Panorama: explanation/capacidades-funcionales-rrhh.md
+      - Estructura organizacional: explanation/capacidades-funcionales/estructura-organizacional.md
+      - Personas y posiciones: explanation/capacidades-funcionales/personas-y-posiciones.md
+      - Asignaciones funcionales: explanation/capacidades-funcionales/asignaciones-funcionales.md
+      - Ausencias: explanation/capacidades-funcionales/ausencias.md
+      - Cargues y novedades: explanation/capacidades-funcionales/cargues-y-novedades.md
+  - Tutorial:
+      - Puesta en marcha: tutorials/quickstart.md
+  - Guías prácticas:
+      - Desarrollo local: how-to/local-development.md
+      - Pruebas: how-to/testing.md
+      - Despliegue en Render: how-to/deployment-render.md
+  - Referencia:
+      - API: reference/api.md
+      - Variables de entorno: reference/environment-variables.md
+      - Esquema de datos: reference/schemas.md
+      - Dependencias: DEPENDENCY_SCAN_AND_IMPROVEMENTS.md
+  - Arquitectura:
+      - Visión general: explanation/architecture-overview.md
+      - Guía técnica para pares: explanation/peer-guide.md
+      - Diagramas: diagrams/index.md
+      - Decisiones (ADR): adr/index.md
+  - Guías complementarias:
+      - Git hooks y Semantic Release: git_hooks_semantic_release.md
+      - Gobernanza en Azure DevOps: guia_configuracion_azure_devops.md
+      - Gestión de personal (legacy): guia_inicio_gestion_personal.md

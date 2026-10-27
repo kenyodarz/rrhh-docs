@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Arquitectura de RRHH",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "full-stack",
+        "label": "Vista full-stack",
+        "focus": [
+          "canal",
+          "web",
+          "api",
+          "domain",
+          "postgres"
+        ],
+        "note": "Sigue una operación desde Angular hasta la persistencia."
+      },
+      {
+        "id": "batch-and-ai",
+        "label": "Batch e IA",
+        "focus": [
+          "domain",
+          "batch",
+          "batchmeta",
+          "ai",
+          "provider"
+        ],
+        "note": "Muestra los adaptadores secundarios del backend."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "canal",
+      "type": "external",
+      "label": "Usuario",
+      "sublabel": "Navegador",
+      "pos": [40, 320],
+      "size": [140, 64]
+    },
+    {
+      "id": "web",
+      "type": "frontend",
+      "label": "Frontend",
+      "sublabel": "Angular 22",
+      "pos": [240, 320],
+      "size": [145, 64],
+      "tag": "SPA"
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "Entry point",
+      "sublabel": "Spring WebFlux",
+      "pos": [455, 320],
+      "size": [145, 64],
+      "tag": "REST"
+    },
+    {
+      "id": "domain",
+      "type": "backend",
+      "label": "Dominio",
+      "sublabel": "Model + Use Cases",
+      "pos": [670, 320],
+      "size": [150, 64],
+      "tag": "Scaffold 5.0.4"
+    },
+    {
+      "id": "r2dbc",
+      "type": "backend",
+      "label": "Adaptador R2DBC",
+      "sublabel": "PostgreSQL",
+      "pos": [895, 160],
+      "size": [150, 64]
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "PostgreSQL",
+      "sublabel": "Datos RRHH + staging",
+      "pos": [1115, 160],
+      "size": [150, 64]
+    },
+    {
+      "id": "batch",
+      "type": "backend",
+      "label": "Adaptador Batch",
+      "sublabel": "Spring Batch",
+      "pos": [895, 350],
+      "size": [150, 64]
+    },
+    {
+      "id": "batchmeta",
+      "type": "database",
+      "label": "Metadatos Batch",
+      "sublabel": "H2 en memoria",
+      "pos": [1115, 350],
+      "size": [150, 64]
+    },
+    {
+      "id": "ai",
+      "type": "backend",
+      "label": "Adaptador de IA",
+      "sublabel": "OpenAI adapter",
+      "pos": [895, 550],
+      "size": [150, 64]
+    },
+    {
+      "id": "provider",
+      "type": "external",
+      "label": "Proveedor de IA",
+      "sublabel": "API configurable",
+      "pos": [1115, 550],
+      "size": [150, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Aplicación web",
+      "wraps": ["web"]
+    },
+    {
+      "kind": "region",
+      "label": "Backend RRHH",
+      "wraps": ["api", "domain", "r2dbc", "batch", "ai"]
+    },
+    {
+      "kind": "region",
+      "label": "Almacenamiento",
+      "wraps": ["postgres", "batchmeta"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "user-to-web",
+      "from": "canal",
+      "to": "web",
+      "label": "interacción",
+      "variant": "emphasis"
+    },
+    {
+      "id": "web-to-api",
+      "from": "web",
+      "to": "api",
+      "label": "HTTP JSON / multipart",
+      "labelAt": [420, 398],
+      "variant": "emphasis"
+    },
+    {
+      "id": "api-to-domain",
+      "from": "api",
+      "to": "domain",
+      "label": "invoca caso de uso",
+      "labelAt": [635, 398]
+    },
+    {
+      "id": "domain-to-r2dbc",
+      "from": "domain",
+      "to": "r2dbc",
+      "label": "usa puerto de persistencia"
+    },
+    {
+      "id": "r2dbc-to-postgres",
+      "from": "r2dbc",
+      "to": "postgres",
+      "label": "R2DBC"
+    },
+    {
+      "id": "domain-to-batch",
+      "from": "domain",
+      "to": "batch",
+      "label": "procesamiento de Excel",
+      "labelAt": [780, 428]
+    },
+    {
+      "id": "batch-to-postgres",
+      "from": "batch",
+      "to": "postgres",
+      "label": "lee staging y sincroniza datos",
+      "labelAt": [1000, 440],
+      "variant": "emphasis"
+    },
+    {
+      "id": "batch-to-metadata",
+      "from": "batch",
+      "to": "batchmeta",
+      "label": "metadatos del job",
+      "labelAt": [1190, 450]
+    },
+    {
+      "id": "domain-to-ai",
+      "from": "domain",
+      "to": "ai",
+      "label": "solicita generación"
+    },
+    {
+      "id": "ai-to-provider",
+      "from": "ai",
+      "to": "provider",
+      "label": "API externa"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "Límites de responsabilidad",
+      "items": [
+        "Angular consume la API HTTP y organiza la interfaz por funcionalidad.",
+        "Los casos de uso coordinan puertos sin acoplar el dominio a PostgreSQL."
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Persistencia e integraciones",
+      "items": [
+        "R2DBC usa PostgreSQL para datos de negocio y staging.",
+        "Spring Batch mantiene metadatos en H2 en memoria.",
+        "La integración de IA se configura por variables de entorno."
+      ]
+    }
+  ]
+}

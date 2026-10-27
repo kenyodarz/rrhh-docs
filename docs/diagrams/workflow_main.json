@@ -1,0 +1,222 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Workflow del cargue de personal",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "client",
+      "label": "Interfaz Angular"
+    },
+    {
+      "id": "entry",
+      "label": "API WebFlux"
+    },
+    {
+      "id": "staging",
+      "label": "Persistencia de staging"
+    },
+    {
+      "id": "batch",
+      "label": "Procesamiento Spring Batch"
+    },
+    {
+      "id": "status",
+      "label": "Estado y alertas"
+    }
+  ],
+  "phases": [
+    {
+      "id": "upload",
+      "label": "Recepción",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "execute",
+      "label": "Staging y ejecución",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "result",
+      "label": "Resultado",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "dashed"
+    }
+  ],
+  "mainPath": [
+    "start",
+    "receive",
+    "stage",
+    "process",
+    "complete",
+    "poll"
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "lane": "client",
+      "col": 0,
+      "type": "external",
+      "label": "Archivo Excel",
+      "sublabel": "selección del usuario"
+    },
+    {
+      "id": "receive",
+      "lane": "entry",
+      "col": 1,
+      "type": "backend",
+      "label": "Validar solicitud",
+      "sublabel": "multipart: archivo",
+      "width": 132
+    },
+    {
+      "id": "reject",
+      "lane": "entry",
+      "col": 2,
+      "type": "security",
+      "label": "Rechazar",
+      "sublabel": "400 solicitud inválida"
+    },
+    {
+      "id": "stage",
+      "lane": "staging",
+      "col": 2,
+      "type": "database",
+      "label": "Guardar staging",
+      "sublabel": "estado CARGADO",
+      "width": 124
+    },
+    {
+      "id": "accepted",
+      "lane": "client",
+      "col": 3,
+      "type": "frontend",
+      "label": "Responder 201",
+      "sublabel": "ID de cargue",
+      "tag": "sin esperar al job"
+    },
+    {
+      "id": "process",
+      "lane": "batch",
+      "col": 3,
+      "type": "backend",
+      "label": "Ejecutar job",
+      "sublabel": "estado EN_PROCESO"
+    },
+    {
+      "id": "complete",
+      "lane": "batch",
+      "col": 4,
+      "type": "database",
+      "label": "Finalizar lote",
+      "sublabel": "PROCESADO o FALLIDO"
+    },
+    {
+      "id": "alerts",
+      "lane": "status",
+      "col": 5,
+      "type": "backend",
+      "label": "Detectar novedades",
+      "sublabel": "crear alertas si aplica",
+      "width": 136
+    },
+    {
+      "id": "poll",
+      "lane": "client",
+      "col": 5,
+      "type": "frontend",
+      "label": "Consultar estado",
+      "sublabel": "GET por cargueId",
+      "width": 126
+    }
+  ],
+  "edges": [
+    {
+      "id": "start-to-receive",
+      "from": "start",
+      "to": "receive",
+      "label": "multipart/form-data"
+    },
+    {
+      "id": "invalid-request",
+      "from": "receive",
+      "to": "reject",
+      "label": "archivo ausente o inválido",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "valid-to-stage",
+      "from": "receive",
+      "to": "stage",
+      "label": "archivo aceptado",
+      "variant": "emphasis"
+    },
+    {
+      "id": "stage-to-response",
+      "from": "stage",
+      "to": "accepted",
+      "label": "retornar control"
+    },
+    {
+      "id": "stage-to-process",
+      "from": "stage",
+      "to": "process",
+      "label": "suscribir procesamiento",
+      "variant": "dashed",
+      "role": "async"
+    },
+    {
+      "id": "process-success",
+      "from": "process",
+      "to": "complete",
+      "label": "job exitoso",
+      "variant": "emphasis"
+    },
+    {
+      "id": "process-failure",
+      "from": "process",
+      "to": "complete",
+      "label": "error: estado FALLIDO",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "complete-to-alerts",
+      "from": "complete",
+      "to": "alerts",
+      "label": "si el lote se procesó"
+    },
+    {
+      "id": "complete-to-poll",
+      "from": "complete",
+      "to": "poll",
+      "label": "el cliente consulta el resultado",
+      "role": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Respuesta independiente",
+      "items": [
+        "El endpoint retorna el control del lote antes de esperar la ejecución batch.",
+        "El cliente usa el identificador para consultar el estado."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Cierre del proceso",
+      "items": [
+        "El lote termina como PROCESADO o FALLIDO.",
+        "Los lotes procesados pueden generar alertas por novedades inter-mes."
+      ]
+    }
+  ]
+}

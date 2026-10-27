@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Secuencia del cargue de personal",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [1000, 1160],
+    "views": [
+      {
+        "id": "accept-upload",
+        "label": "Guardar cargue",
+        "focus": ["web", "api", "usecase", "postgres"],
+        "note": "La API persiste el archivo y responde con el control del lote."
+      },
+      {
+        "id": "process-later",
+        "label": "Procesamiento y consulta",
+        "focus": ["api", "usecase", "batch", "postgres"],
+        "note": "El job se procesa sin que la respuesta de carga lo espere."
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "web",
+      "type": "frontend",
+      "label": "Angular",
+      "sublabel": "Cliente web"
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "WebFlux API",
+      "sublabel": "Router + Handler"
+    },
+    {
+      "id": "usecase",
+      "type": "backend",
+      "label": "Casos de uso",
+      "sublabel": "Staging + Batch"
+    },
+    {
+      "id": "batch",
+      "type": "backend",
+      "label": "Adaptador Batch",
+      "sublabel": "Spring Batch"
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "PostgreSQL",
+      "sublabel": "Staging + negocio"
+    }
+  ],
+  "segments": [
+    {
+      "from": 150,
+      "to": 330,
+      "label": "Carga multipart y staging"
+    },
+    {
+      "from": 350,
+      "to": 700,
+      "label": "Disparo y procesamiento batch"
+    },
+    {
+      "from": 730,
+      "to": 1020,
+      "label": "Consulta de estado"
+    }
+  ],
+  "messages": [
+    {
+      "id": "upload",
+      "from": "web",
+      "to": "api",
+      "y": 170,
+      "label": "POST /api/cargue-personal/upload",
+      "variant": "emphasis"
+    },
+    {
+      "id": "create-control",
+      "from": "api",
+      "to": "usecase",
+      "y": 215,
+      "label": "crear control y leer Excel",
+      "variant": "default"
+    },
+    {
+      "id": "save-staging",
+      "from": "usecase",
+      "to": "postgres",
+      "y": 260,
+      "label": "guardar control y filas crudas",
+      "variant": "emphasis"
+    },
+    {
+      "id": "staging-saved",
+      "from": "postgres",
+      "to": "usecase",
+      "y": 305,
+      "label": "control actualizado",
+      "variant": "return"
+    },
+    {
+      "id": "trigger-batch",
+      "from": "api",
+      "to": "usecase",
+      "y": 360,
+      "label": "suscribirse al procesamiento batch",
+      "variant": "dashed"
+    },
+    {
+      "id": "accepted",
+      "from": "api",
+      "to": "web",
+      "y": 405,
+      "label": "201 Created con ID del cargue",
+      "variant": "return",
+      "note": "La respuesta no espera la finalización del job."
+    },
+    {
+      "id": "run-batch",
+      "from": "usecase",
+      "to": "batch",
+      "y": 470,
+      "label": "procesarLoteStaging",
+      "variant": "emphasis"
+    },
+    {
+      "id": "read-process-write",
+      "from": "batch",
+      "to": "postgres",
+      "y": 530,
+      "label": "leer staging y sincronizar entidades",
+      "variant": "default"
+    },
+    {
+      "id": "batch-result",
+      "from": "batch",
+      "to": "usecase",
+      "y": 590,
+      "label": "resultado procesado o fallido",
+      "variant": "return"
+    },
+    {
+      "id": "save-result-alerts",
+      "from": "usecase",
+      "to": "postgres",
+      "y": 650,
+      "label": "actualizar estado y guardar alertas",
+      "variant": "emphasis"
+    },
+    {
+      "id": "poll",
+      "from": "web",
+      "to": "api",
+      "y": 760,
+      "label": "GET /api/cargue-personal/{id}/estado",
+      "variant": "default"
+    },
+    {
+      "id": "find-status",
+      "from": "api",
+      "to": "usecase",
+      "y": 820,
+      "label": "consultarEstado",
+      "variant": "default"
+    },
+    {
+      "id": "read-control",
+      "from": "usecase",
+      "to": "postgres",
+      "y": 880,
+      "label": "buscar control del lote",
+      "variant": "default"
+    },
+    {
+      "id": "return-status",
+      "from": "usecase",
+      "to": "api",
+      "y": 940,
+      "label": "estado y contadores",
+      "variant": "return"
+    },
+    {
+      "id": "status-response",
+      "from": "api",
+      "to": "web",
+      "y": 1000,
+      "label": "200 OK con estado del lote",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "api",
+      "from": 168,
+      "to": 415,
+      "type": "backend"
+    },
+    {
+      "participant": "usecase",
+      "from": 210,
+      "to": 660,
+      "type": "backend"
+    },
+    {
+      "participant": "batch",
+      "from": 465,
+      "to": 600,
+      "type": "backend"
+    },
+    {
+      "participant": "postgres",
+      "from": 255,
+      "to": 890,
+      "type": "database"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Respuesta de carga",
+      "items": [
+        "El endpoint guarda las filas en staging antes de responder.",
+        "El handler inicia el procesamiento mediante una suscripción sin esperarlo."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Seguimiento del lote",
+      "items": [
+        "El caso de uso actualiza el estado y los contadores.",
+        "El cliente consulta el control por su ID.",
+        "Las novedades inter-mes generan alertas persistentes."
+      ]
+    }
+  ]
+}

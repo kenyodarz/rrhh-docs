@@ -1,20 +1,42 @@
-# Guías técnicas
+# RRHH
 
-Bienvenido al sitio de documentación pública. Aquí se publican únicamente guías
-técnicas genéricas cuyo contenido ha sido revisado y aprobado para difusión.
+RRHH reúne una interfaz Angular y una API reactiva para gestionar información de personas y estructura organizacional. El backend usa Clean Architecture, PostgreSQL y Spring Batch para procesar cargues masivos de personal.
 
-## Guías disponibles
+## Ruta para Product Owners y equipos funcionales
 
-- [Git hooks y Semantic Release](git_hooks_semantic_release.md): configuración
-  de un hook para validar mensajes de commit y métodos de instalación compartida.
-- [Gobernanza en Azure DevOps](guia_configuracion_azure_devops.md): ejemplos
-  reutilizables de plantillas de pull request, contribución y pipelines.
-- [Aplicación de gestión de personal](guia_inicio_gestion_personal.md): guía
-  introductoria con arquitectura, modelo de datos y ejemplos de Java, Angular e IA.
+Conoce [qué capacidades ofrece RRHH](explanation/capacidades-funcionales-rrhh.md) y recorre sus procesos desde la perspectiva del negocio:
 
-## Alcance de la publicación
+- [Estructura organizacional](explanation/capacidades-funcionales/estructura-organizacional.md)
+- [Personas y posiciones](explanation/capacidades-funcionales/personas-y-posiciones.md)
+- [Asignaciones funcionales](explanation/capacidades-funcionales/asignaciones-funcionales.md)
+- [Ausencias](explanation/capacidades-funcionales/ausencias.md)
+- [Cargues y novedades](explanation/capacidades-funcionales/cargues-y-novedades.md)
 
-Los ejemplos son orientativos y deben adaptarse y validarse antes de utilizarlos.
-No se incluyen configuraciones reales de infraestructura, requisitos internos de negocio,
-planes de migración, documentos de sprint ni procedimientos internos de
-recursos humanos.
+Estas páginas describen capacidades respaldadas por el backend. La interfaz Janus sirve como contexto de uso; las reglas y límites documentados se contrastan con la implementación de RRHH.
+
+## Empieza aquí
+
+- [Puesta en marcha local](tutorials/quickstart.md): prepara PostgreSQL y ejecuta frontend y backend.
+- [Desarrollo local](how-to/local-development.md): configura servicios y variables.
+- [Referencia de API](reference/api.md): consulta rutas y enlaces a OpenAPI/Scalar.
+- [Arquitectura](explanation/architecture-overview.md): conoce las capas y los principales flujos.
+- [Diagramas interactivos](diagrams/index.md): explora arquitectura, secuencia y workflow con Archify.
+
+## Componentes
+
+| Componente | Tecnología | Responsabilidad |
+|---|---|---|
+| Frontend | Angular 22 | Interfaz de gestión de personal y estructura organizacional. |
+| API | Java 25, Spring WebFlux | Expone operaciones de negocio y coordina casos de uso. |
+| Persistencia | PostgreSQL y R2DBC | Guarda las entidades, staging de cargues y alertas. |
+| Procesamiento por lotes | Spring Batch | Filtra y sincroniza archivos de personal. |
+
+## Mapa documental
+
+- **Capacidades funcionales:** qué resuelve el backend y cómo se agrupan sus procesos para Product Owners.
+- **Tutoriales:** aprendizaje guiado para levantar el sistema.
+- **Guías prácticas:** desarrollo, pruebas y despliegue.
+- **Referencia:** API, variables de configuración y esquema de datos.
+- **Explicación:** arquitectura y decisiones técnicas.
+
+El README de la raíz ofrece un inicio rápido. Esta documentación refleja el código y la configuración del repositorio; para dudas sobre el comportamiento, consulta las rutas, handlers y casos de uso enlazados en la referencia.
